@@ -5,6 +5,7 @@ CXXFLAGS = -std=c++20 -Wall -O3 -Iinclude #-g -Iinclude
 # Find all source files automatically
 SRCDIR = .
 OBJDIR = obj
+Debeg = $(shell find $(SRCDIR) -name "*.txt")
 SRCS = $(shell find $(SRCDIR) -name "*.cpp")
 OBJS = $(patsubst %.cpp, $(OBJDIR)/%.o, $(SRCS))
 
@@ -25,7 +26,7 @@ $(OBJDIR)/%.o: %.cpp
 
 # Clean rule to remove generated files
 clean:
-	rm -rf $(OBJDIR) $(TARGET)
+	rm -rf $(OBJDIR) $(TARGET) $(Debeg)
 
 # Phony targets
 .PHONY: all clean

@@ -5,6 +5,7 @@
 #include <vector>
 #include <mutex>
 #include <thread>
+#include <CycleTimer.h>
 #include <type.h>
 
 using namespace block;
@@ -14,7 +15,7 @@ using MonthlySolutions = std::vector<DailySolutions>;              // 每月的�
 using YearlySolutions = std::vector<MonthlySolutions>;             // 一整年的所有解
 
 YearlySolutions solutions(12, MonthlySolutions(31)); // 12 個月，每個月都先開31天
-
+std::mutex solutions_mutex;
 
 uint_fast8_t Board[10][10] = {
       {0, 0, 0, 0, 0, 0, 9, 9, 9, 9}, {0, 0, 0, 0, 0, 0, 9, 9, 9, 9},
@@ -103,59 +104,71 @@ uint_fast8_t get_day() {
   return 0;
 }
 
-void backtrack(uint_fast8_t placed,
+void backtrack(uint_fast8_t placed, 
                std::span<const std::span<const uint_fast8_t[4][4]>> pieces) {
-  using namespace std::literals;
-  if (placed == 8) {
-    if (!valid()) {
-      return;
-    }
-    const uint16_t month = get_month() - 1; // 當作 array 的 month index
-    const uint16_t day = get_day() - 1; // //當作 array 的 day index
+    using namespace std::literals;
+    if (placed == 8) {
+        if (!valid()) return;
+        const uint16_t month = get_month() - 1;
+        const uint16_t day = get_day() - 1;
 
+        SolutionBoard currentSolution;
+        for (uint_fast8_t i = 0; i < 7; ++i) {
+            for (uint_fast8_t j = 0; j < 7; ++j) {
+                currentSolution[i][j] = Board[i][j];
+            }
+        }    
 
-
-    SolutionBoard currentSolution;
-    for (uint_fast8_t i = 0; i < 7; ++i) {
-      for (uint_fast8_t j = 0; j < 7; ++j) {
-        currentSolution[i][j] = Board[i][j];
-      }
-    }
-    solutions[month][day].push_back(currentSolution);
-
-    // 原本寫檔案的解法我先碼掉
-    // std::ofstream fout(std::to_string(month) + '_' + std::to_string(day) +
-    //                        ".txt"s,
-    //                    std::ios::app);
-    // for (uint_fast8_t i = 0; i < 7; ++i) {
-    //   for (uint_fast8_t j = 0; j < 7; ++j) {
-    //     fout << static_cast<uint16_t>(Board[i][j]);
-    //   }
-    //   fout << '\n';
-    // }
-    // fout << '\n';
-    return;
-  }
-  if (placed + pieces.size() < 8) {
-    return;
-  }
-  for (uint_fast8_t i = 0; i < pieces.size(); ++i) {
-    const auto piece = pieces[i];
-    for (const auto shape : piece) {
-      for (uint_fast8_t x = 0; x < 7; ++x) {
-        for (uint_fast8_t y = 0; y < 7; ++y) {
-          if (can_place(shape, x, y)) {
-            place(shape, x, y);
-            backtrack(placed + 1, pieces.subspan(i + 1));
-            unplace(shape, x, y);
+        // For checking answer
+        std::ofstream fout(std::to_string(month + 1) + '_' + std::to_string(day + 1) + ".txt"s, std::ios::app);
+        for (uint_fast8_t i = 0; i < 7; ++i) {
+          for (uint_fast8_t j = 0; j < 7; ++j) {
+            fout << static_cast<uint16_t>(currentSolution[i][j]);
           }
+          fout << '\n';
         }
-      }
+        fout << '\n';
+
+        std::lock_guard<std::mutex> lock(solutions_mutex);
+        solutions[month][day].push_back(currentSolution);
+        return;
     }
-  }
+
+    if (placed + pieces.size() < 8) return;
+
+    for (uint_fast8_t i = 0; i < pieces.size(); ++i) {
+        const auto piece = pieces[i];
+        for (const auto shape : piece) {
+            for (uint_fast8_t x = 0; x < 7; ++x) {
+                for (uint_fast8_t y = 0; y < 7; ++y) {
+                    if (can_place(shape, x, y)) {
+                        place(shape, x, y);
+                        #pragma omp task firstprivate(Board, x, y, shape, placed)
+                        {
+                            backtrack(placed + 1, pieces.subspan(i + 1));
+                        }
+                        unplace(shape, x, y);
+                    }
+                }
+            }
+        }
+    }
+    #pragma omp taskwait
 }
 
 int main() {
   std::ios::sync_with_stdio(false);
-  backtrack(0, Pieces);
+  
+  double start_time = currentSeconds();
+  #pragma omp parallel
+  {
+    #pragma omp single
+    {
+        backtrack(0, Pieces);
+    }
+  }
+  double end_time = currentSeconds();
+
+  double ElapsedTime = end_time - start_time;
+  std::cout << "Elapsed Time: " << ElapsedTime << std::endl;
 }
