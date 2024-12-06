@@ -1,32 +1,31 @@
+# Compiler and flags
 CXX = g++
-CXXFLAGS = -std=c++20 -Wall -O3 #-g -Iinclude
+CXXFLAGS = -std=c++20 -Wall -O3 -Iinclude #-g -Iinclude
 
-TARGET = test
+# Find all source files automatically
+SRCDIR = .
+OBJDIR = obj
+SRCS = $(shell find $(SRCDIR) -name "*.cpp")
+OBJS = $(patsubst %.cpp, $(OBJDIR)/%.o, $(SRCS))
 
-all:
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
-
-
-# Directories
-SRC_DIR = .
-# OBJ_DIR = obj
-
-# Source files
-SRCS = main.cpp
-
-# Object files (put them in the obj directory)
-OBJS = $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+# Target executable
+TARGET = Puzzle_solver
 
 # Default rule to build the target
-$(TARGET): 
+all: $(TARGET)
+
+# Rule to build the target executable
+$(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
 
-# $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-# 	mkdir -p $(OBJ_DIR)
-# 	$(CXX) $(CXXFLAGS) -c $< -o $@
+# Rule to compile source files into object files
+$(OBJDIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)   # Create the necessary directory for object files
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+# Clean rule to remove generated files
 clean:
-	rm -rf $(TARGET)
+	rm -rf $(OBJDIR) $(TARGET)
 
 # Phony targets
-.PHONY: clean
+.PHONY: all clean
