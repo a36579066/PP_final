@@ -2,8 +2,18 @@
 #include <fstream>
 #include <iostream>
 #include <span>
+#include <vector>
+
 
 namespace {
+
+using SolutionBoard = std::array<std::array<uint_fast8_t, 7>, 7>;  // 單個 7x7 棋盤的解
+using DailySolutions = std::vector<SolutionBoard>;                 // 一天的所有解
+using MonthlySolutions = std::vector<DailySolutions>;              // 每月的所有天解
+using YearlySolutions = std::vector<MonthlySolutions>;             // 一整年的所有解
+
+YearlySolutions solutions(12, MonthlySolutions(31)); // 12 個月，每個月都先開31天
+
 
 uint_fast8_t Board[10][10] = {
     {0, 0, 0, 0, 0, 0, 9, 9, 9, 9}, {0, 0, 0, 0, 0, 0, 9, 9, 9, 9},
@@ -407,19 +417,30 @@ void backtrack(uint_fast8_t placed,
     if (!valid()) {
       return;
     }
-    const uint16_t month = get_month();
-    const uint16_t day = get_day();
+    const uint16_t month = get_month() - 1; // 當作 array 的 month index
+    const uint16_t day = get_day() - 1; // //當作 array 的 day index
 
-    std::ofstream fout(std::to_string(month) + '_' + std::to_string(day) +
-                           ".txt"s,
-                       std::ios::app);
+
+
+    SolutionBoard currentSolution;
     for (uint_fast8_t i = 0; i < 7; ++i) {
       for (uint_fast8_t j = 0; j < 7; ++j) {
-        fout << static_cast<uint16_t>(Board[i][j]);
+        currentSolution[i][j] = Board[i][j];
       }
-      fout << '\n';
     }
-    fout << '\n';
+    solutions[month][day].push_back(currentSolution);
+
+    // 原本寫檔案的解法我先碼掉
+    // std::ofstream fout(std::to_string(month) + '_' + std::to_string(day) +
+    //                        ".txt"s,
+    //                    std::ios::app);
+    // for (uint_fast8_t i = 0; i < 7; ++i) {
+    //   for (uint_fast8_t j = 0; j < 7; ++j) {
+    //     fout << static_cast<uint16_t>(Board[i][j]);
+    //   }
+    //   fout << '\n';
+    // }
+    // fout << '\n';
     return;
   }
   if (placed + pieces.size() < 8) {
