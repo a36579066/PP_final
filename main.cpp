@@ -110,8 +110,8 @@ void backtrack(uint_fast8_t placed,
     if (!valid()) {
       return;
     }
-    const uint16_t month = get_month() - 1; // 當作 array 的 month index
-    const uint16_t day = get_day() - 1; // //當作 array 的 day index
+    // const uint16_t month = get_month() - 1; // 當作 array 的 month index
+    // const uint16_t day = get_day() - 1; // //當作 array 的 day index
 
 
 
@@ -121,7 +121,7 @@ void backtrack(uint_fast8_t placed,
         currentSolution[i][j] = Board[i][j];
       }
     }
-    solutions[month][day].push_back(currentSolution);
+    solutions[0][0].push_back(currentSolution);
 
     // 原本寫檔案的解法我先碼掉
     // std::ofstream fout(std::to_string(month) + '_' + std::to_string(day) +
@@ -157,5 +157,16 @@ void backtrack(uint_fast8_t placed,
 
 int main() {
   std::ios::sync_with_stdio(false);
+
+  auto start_time = std::chrono::high_resolution_clock::now();
+
   backtrack(0, Pieces);
+
+  auto end_time = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed = end_time - start_time;
+
+  std::cout << "slove solutions: " << solutions[0][0].size() << std::endl;
+  std::cout << "run time: " << elapsed.count() << " sec" << std::endl;
+
+  return 0;
 }
