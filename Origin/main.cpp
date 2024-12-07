@@ -6,6 +6,7 @@
 #include <mutex>
 #include <thread>
 #include <type.h>
+#include <CycleTimer.h>
 
 using namespace block;
 using SolutionBoard = std::array<std::array<uint_fast8_t, 7>, 7>;  // 單個 7x7 棋盤的解
@@ -113,8 +114,6 @@ void backtrack(uint_fast8_t placed,
     const uint16_t month = get_month() - 1; // 當作 array 的 month index
     const uint16_t day = get_day() - 1; // //當作 array 的 day index
 
-
-
     SolutionBoard currentSolution;
     for (uint_fast8_t i = 0; i < 7; ++i) {
       for (uint_fast8_t j = 0; j < 7; ++j) {
@@ -157,5 +156,12 @@ void backtrack(uint_fast8_t placed,
 
 int main() {
   std::ios::sync_with_stdio(false);
+
+  double start_time = currentSeconds();
+  
   backtrack(0, Pieces);
+
+  double end_time = currentSeconds();
+  double ElapsedTime = end_time - start_time;
+  std::cout << "Elapsed Time: " << ElapsedTime << " (s)" << std::endl;
 }
