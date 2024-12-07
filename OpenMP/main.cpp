@@ -7,6 +7,7 @@
 #include <thread>
 #include <CycleTimer.h>
 #include <type.h>
+#include <omp.h>
 
 using namespace block;
 using SolutionBoard = std::array<std::array<uint_fast8_t, 7>, 7>;  // 單個 7x7 棋盤的解
