@@ -1,7 +1,4 @@
 # PP_final
-> [!CAUTION]
-> Wrong answer, need to debug
-
 ## Quick start
 ```
 cd OpenMP
