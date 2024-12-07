@@ -4,6 +4,9 @@
 
 - run the code
 ```
-make
+cd parallel
+g++ -std=c++20 -Wall -O3 -fopenmp -Iinclude -o Puzzle_solver .\one_level.cpp
+g++ -std=c++20 -Wall -O3 -fopenmp -Iinclude -o Puzzle_solver .\two_level.cpp
 ./Puzzle_solver
 ```
+- 小弟用windows，makefile裡的find用不了...
