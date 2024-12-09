@@ -122,7 +122,7 @@ void backtrack(uint_fast8_t placed,
     }
 
     // For checking answer
-    std::ofstream fout(std::to_string(month + 1) + '_' + std::to_string(day + 1) + ".txt"s, std::ios::app);
+    std::ofstream fout("./answer/" + std::to_string(month + 1) + '_' + std::to_string(day + 1) + ".txt"s, std::ios::app);
         for (uint_fast8_t i = 0; i < 7; ++i) {
           for (uint_fast8_t j = 0; j < 7; ++j) {
             fout << static_cast<uint16_t>(currentSolution[i][j]);

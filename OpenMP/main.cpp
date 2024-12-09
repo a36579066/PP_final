@@ -110,7 +110,7 @@ void backtrack(uint_fast8_t Board[10][10], uint_fast8_t placed, std::span<const 
         }
 
         // For verification
-        std::ofstream fout(std::to_string(month) + '_' + std::to_string(day) + ".txt", std::ios::app);
+        std::ofstream fout("./result/" + std::to_string(month) + '_' + std::to_string(day) + ".txt", std::ios::app);
         for (uint_fast8_t i = 0; i < 7; ++i) {
             for (uint_fast8_t j = 0; j < 7; ++j) {
                 fout << static_cast<uint16_t>(currentSolution[i][j]);
@@ -137,7 +137,7 @@ void backtrack(uint_fast8_t Board[10][10], uint_fast8_t placed, std::span<const 
                 for (uint_fast8_t y = 0; y < 7; ++y) {
                     if (can_place(LocalBoard, shape, x, y)) {
                         place(LocalBoard, shape, x, y);
-                        #pragma omp task firstprivate(Board)
+                        #pragma omp task firstprivate(LocalBoard)
                         {
                             backtrack(LocalBoard, placed + 1, pieces.subspan(i + 1));
                         }
@@ -152,8 +152,31 @@ void backtrack(uint_fast8_t Board[10][10], uint_fast8_t placed, std::span<const 
     #pragma omp taskwait
 }
 
-int main() {
+int main(int argc, char** argv) {
     std::ios::sync_with_stdio(false);
+
+    int thread_count = -1;
+    if (argc == 2)
+    {
+        thread_count = atoi(argv[1]);
+    }
+
+    printf("----------------------------------------------------------\n");
+    printf("Max system threads = %d\n", omp_get_max_threads());
+    if (thread_count > 0)
+    {
+        thread_count = std::min(thread_count, omp_get_max_threads());
+        printf("Running with %d threads\n", thread_count);
+    }
+    printf("----------------------------------------------------------\n");
+
+    if (thread_count <= -1){
+        int max_threads = omp_get_max_threads();
+        omp_set_num_threads(max_threads);
+    }
+    else{
+        omp_set_num_threads(thread_count);
+    }
 
     uint_fast8_t InitialBoard[10][10] = {
         {0, 0, 0, 0, 0, 0, 9, 9, 9, 9}, {0, 0, 0, 0, 0, 0, 9, 9, 9, 9},
@@ -162,9 +185,8 @@ int main() {
         {0, 0, 0, 9, 9, 9, 9, 9, 9, 9}, {9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
         {9, 9, 9, 9, 9, 9, 9, 9, 9, 9}, {9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
     };
-
+    
     double start_time = currentSeconds();
-
     #pragma omp parallel
     {
         #pragma omp single
@@ -172,7 +194,6 @@ int main() {
             backtrack(InitialBoard, 0, Pieces);
         }
     }
-
     double end_time = currentSeconds();
     double ElapsedTime = end_time - start_time;
     std::cout << "Elapsed Time: " << ElapsedTime << " (s)" << std::endl;
