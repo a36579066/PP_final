@@ -1,9 +1,19 @@
 # PP_final
-## Quick start
+## Generate solution 
 ```
 cd OpenMP
 make
-./Puzzle_solver
+./Puzzle_solver [thread number: int]
+```
+## Visualization
+> [!IMPORTANT]
+> Make sure you've generate the solutions in the `./OpenMP/result` folder
+> Python virtual environment with `flask` package
+
+```
+cd Visuzlization
+python server.py
+# Then Click the localhost web address 
 ```
 
 ## Reference
