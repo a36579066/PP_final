@@ -137,6 +137,7 @@ void backtrack(uint_fast8_t placed,
     return;
   }
   if (placed + pieces.size() < 8) {
+    //std::cout <<(int)placed<<" " << pieces.size() <<std::endl;
     return;
   }
   for (uint_fast8_t i = 0; i < pieces.size(); ++i) {
@@ -147,7 +148,7 @@ void backtrack(uint_fast8_t placed,
           if (can_place(shape, x, y)) {
             place(shape, x, y);
             backtrack(placed + 1, pieces.subspan(i + 1));
-            unplace(shape, x, y);
+            unplace(shape, x, y); 
           }
         }
       }
@@ -158,4 +159,19 @@ void backtrack(uint_fast8_t placed,
 int main() {
   std::ios::sync_with_stdio(false);
   backtrack(0, Pieces);
+  // 原本寫檔案的解法我先碼掉
+
+    std::ofstream fout("./sol/" + std::to_string(1) + '_' + std::to_string(1) +
+                           ".txt",
+                       std::ios::app);
+    for(auto &sol : solutions[0][0]){
+      for (uint_fast8_t i = 0; i < 7; ++i) {
+        for (uint_fast8_t j = 0; j < 7; ++j) {
+          fout << static_cast<uint16_t>(sol[i][j]);
+        }
+        fout << '\n';
+      }
+      fout << '\n';
+    }
+    
 }
