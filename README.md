@@ -12,7 +12,7 @@ make
 > * Remember to reload the web (F5) if u want to change the day
 
 ```
-cd Visuzlization
+cd Visualization
 python server.py
 # Then Click the localhost web address 
 ```
