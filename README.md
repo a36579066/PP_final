@@ -9,6 +9,7 @@ make
 > [!IMPORTANT]
 > * Make sure you've generate the solutions in the `./OpenMP/result` folder
 > * Python virtual environment with `flask` package
+> * Remember to reload the web (F5) if u want to change the day
 
 ```
 cd Visuzlization
