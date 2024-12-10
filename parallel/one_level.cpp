@@ -3,10 +3,12 @@
 #include <iostream>
 #include <span>
 #include <vector>
+#include <mutex>
 #include <thread>
-#include <type.h>
 #include <omp.h>
-#include <chrono>
+
+#include "type.h"
+#include "CycleTimer.h"
 
 using namespace block;
 using SolutionBoard = std::array<std::array<uint_fast8_t, 7>, 7>;
@@ -109,6 +111,9 @@ void backtrack(uint_fast8_t placed,
   if (placed == 8) {
     if (!valid(localBoard)) return;
 
+    uint16_t month = get_month(localBoard);
+    uint16_t day = get_day(localBoard);
+
     SolutionBoard currentSolution;
     for (uint_fast8_t i = 0; i < 7; ++i) {
       for (uint_fast8_t j = 0; j < 7; ++j) {
@@ -116,8 +121,19 @@ void backtrack(uint_fast8_t placed,
       }
     }
 
+    // For verification
+      std::ofstream fout(std::string("./answer/") + std::to_string(month) + '_' + std::to_string(day) + ".txt", std::ios::app);
+      for (uint_fast8_t i = 0; i < 7; ++i) {
+        for (uint_fast8_t j = 0; j < 7; ++j) {
+          fout << static_cast<uint16_t>(currentSolution[i][j]);
+        }
+        fout << '\n';
+      }
+      fout << '\n';
+
     #pragma omp critical
-    solutions[0][0].push_back(currentSolution);
+    solutions[month - 1][day - 1].push_back(currentSolution);
+    
     return;
   }
 
@@ -140,10 +156,34 @@ void backtrack(uint_fast8_t placed,
   }
 }
 
-int main() {
-  std::ios::sync_with_stdio(false);
-  omp_set_num_threads(4);
-  auto start_time = std::chrono::high_resolution_clock::now();
+int main(int argc, char* argv[]) {
+  // std::ios::sync_with_stdio(false);
+
+  int thread_count = -1;
+  if (argc == 2)
+  {
+      thread_count = atoi(argv[1]);
+  }
+
+  printf("----------------------------------------------------------\n");
+  printf("Max system threads = %d\n", omp_get_max_threads());
+  if (thread_count > 0)
+  {
+      thread_count = std::min(thread_count, omp_get_max_threads());
+      printf("Running with %d threads\n", thread_count);
+  }
+  printf("----------------------------------------------------------\n");
+
+  if (thread_count <= -1){
+      int max_threads = omp_get_max_threads();
+      omp_set_num_threads(max_threads);
+  }
+  else{
+      omp_set_num_threads(thread_count);
+  }
+
+  // start
+  double start_time = CycleTimer::currentSeconds();
 
   #pragma omp parallel
   {
@@ -168,11 +208,9 @@ int main() {
     }
   }
 
-  auto end_time = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed = end_time - start_time;
-
-  std::cout << "solve solutions: " << solutions[0][0].size() << std::endl;
-  std::cout << "run time: " << elapsed.count() << " sec" << std::endl;
+  double end_time = CycleTimer::currentSeconds();
+  double ElapsedTime = end_time - start_time;
+  std::cout << "Elapsed Time: " << ElapsedTime << " (s)" << std::endl;
 
   return 0;
 }

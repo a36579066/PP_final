@@ -5,7 +5,9 @@
 #include <vector>
 #include <mutex>
 #include <thread>
-#include <type.h>
+
+#include "type.h"
+#include "CycleTimer.h"
 
 using namespace block;
 using SolutionBoard = std::array<std::array<uint_fast8_t, 7>, 7>;  // 單個 7x7 棋盤的解
@@ -110,10 +112,8 @@ void backtrack(uint_fast8_t placed,
     if (!valid()) {
       return;
     }
-    // const uint16_t month = get_month() - 1; // 當作 array 的 month index
-    // const uint16_t day = get_day() - 1; // //當作 array 的 day index
-
-
+    const uint16_t month = get_month() - 1; // 當作 array 的 month index
+    const uint16_t day = get_day() - 1; // //當作 array 的 day index
 
     SolutionBoard currentSolution;
     for (uint_fast8_t i = 0; i < 7; ++i) {
@@ -121,19 +121,19 @@ void backtrack(uint_fast8_t placed,
         currentSolution[i][j] = Board[i][j];
       }
     }
-    solutions[0][0].push_back(currentSolution);
 
-    // 原本寫檔案的解法我先碼掉
-    // std::ofstream fout(std::to_string(month) + '_' + std::to_string(day) +
-    //                        ".txt"s,
-    //                    std::ios::app);
-    // for (uint_fast8_t i = 0; i < 7; ++i) {
-    //   for (uint_fast8_t j = 0; j < 7; ++j) {
-    //     fout << static_cast<uint16_t>(Board[i][j]);
-    //   }
-    //   fout << '\n';
-    // }
-    // fout << '\n';
+    // For checking answer
+    std::ofstream fout("./answer/" + std::to_string(month + 1) + '_' + std::to_string(day + 1) + ".txt"s, std::ios::app);
+    for (uint_fast8_t i = 0; i < 7; ++i) {
+      for (uint_fast8_t j = 0; j < 7; ++j) {
+        fout << static_cast<uint16_t>(currentSolution[i][j]);
+      }
+      fout << '\n';
+    }
+    fout << '\n';
+
+    solutions[month][day].push_back(currentSolution);
+
     return;
   }
   if (placed + pieces.size() < 8) {
@@ -158,15 +158,11 @@ void backtrack(uint_fast8_t placed,
 int main() {
   std::ios::sync_with_stdio(false);
 
-  auto start_time = std::chrono::high_resolution_clock::now();
-
+  double start_time = CycleTimer::currentSeconds();
+  
   backtrack(0, Pieces);
 
-  auto end_time = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed = end_time - start_time;
-
-  std::cout << "slove solutions: " << solutions[0][0].size() << std::endl;
-  std::cout << "run time: " << elapsed.count() << " sec" << std::endl;
-
-  return 0;
+  double end_time = CycleTimer::currentSeconds();
+  double ElapsedTime = end_time - start_time;
+  std::cout << "Elapsed Time: " << ElapsedTime << " (s)" << std::endl;
 }
