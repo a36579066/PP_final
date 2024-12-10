@@ -19,8 +19,8 @@ YearlySolutions one_thread_solutions(12, MonthlySolutions(31)); // 12 個月，�
 std::vector<YearlySolutions> solutions(8, one_thread_solutions);
 
 const std::span<const uint_fast8_t[4][4]> Pieces[8] = {
-    block::L_Pentomino, block::Hexomino,    block::N_Pentomino, block::P_Pentomino,
-    block::U_Pentomino, block::V_Pentomino, block::Y_Pentomino, block::Z_Pentomino,
+    block::U_Pentomino, block::Hexomino,    block::N_Pentomino, block::P_Pentomino,
+    block::L_Pentomino, block::V_Pentomino, block::Y_Pentomino, block::Z_Pentomino,
 };
 
 
@@ -195,12 +195,11 @@ int main() {
             th.join();
         }
     }
-    int month = 0;
-    int day = 0;
     
-    // for (uint_fast8_t month = 0; month < 12; ++month) {
-    //     for (uint_fast8_t day = 0; day < 31; ++day) {
-		std::ofstream fout(std::to_string(month + 1) + '_' + std::to_string(day + 1) + "_v3.txt",
+    
+    for (uint_fast8_t month = 0; month < 12; ++month) {
+         for (uint_fast8_t day = 0; day < 31; ++day) {
+		std::ofstream fout("sol/" + std::to_string(month + 1) + '_' + std::to_string(day + 1) + "_v3.txt",
                                    std::ios::app);
 		for(int idx=0;idx<8;idx++){
             if (!solutions[idx][month][day].empty()) {
@@ -216,8 +215,8 @@ int main() {
                 }
             }
 		}
-    //     }
-    // }
+         }
+    }
 
     return 0;
 }

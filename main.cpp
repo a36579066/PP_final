@@ -161,7 +161,7 @@ int main() {
   backtrack(0, Pieces);
   // 原本寫檔案的解法我先碼掉
 
-    std::ofstream fout("./sol/" + std::to_string(1) + '_' + std::to_string(1) +
+    std::ofstream fout("./sol2/" + std::to_string(1) + '_' + std::to_string(1) +
                            ".txt",
                        std::ios::app);
     for(auto &sol : solutions[0][0]){
