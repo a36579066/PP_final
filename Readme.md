@@ -66,7 +66,8 @@ python server.py
 # For pthread method
 - run the code
   - In lunux
-    [!USE_8_CORES]
+    > [!IMPORTANT]
+    > * Make sure you have 8 cores
     1. pthread with mutex
     ```
     cd pthread/mutex
