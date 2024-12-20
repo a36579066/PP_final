@@ -1,11 +1,11 @@
 # Compiler and flags
 CXX = g++
-CXXFLAGS = -std=c++20 -Wall -O3 -g -Iinclude #-g -Iinclude
+CXXFLAGS = -std=c++20 -Wall -O3 -g -Iinclude -mavx -msse4.2 -march=native#-g -Iinclude
 
 # Find all source files automatically
 SRCDIR = ./src/
 OBJDIR = obj
-SRCS = main_thread.cpp
+SRCS = main_thread_no_mutex.cpp
 SRCS += $(shell find $(SRCDIR) -name "*.cpp")
 OBJS = $(patsubst %.cpp, $(OBJDIR)/%.o, $(SRCS))
 
