@@ -1,5 +1,5 @@
 # PP_final
-# For one_two_leve one/two level method
+# For one/two level method
 
 
 - performance
@@ -66,7 +66,7 @@ python server.py
 # For pthread method
 - run the code
   - In lunux
-    [!use 8 cores]
+    [!USE_8_CORES]
     1. pthread with mutex
     ```
     cd pthread/mutex
